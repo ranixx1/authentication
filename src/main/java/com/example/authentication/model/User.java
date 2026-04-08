@@ -11,6 +11,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,23 +33,18 @@ public class User {
     @Column(unique = true, nullable = false)
     private String username;
 
-    @Column (nullable = false)
+    @Column(nullable = false)
     private String numberPhone;
 
-    @Column (nullable = false)
+    @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(unique = true, nullable = false)
-    private String cpf;
-
     @Column
-    @Enumerated(EnumType.STRING)    // Criar formulário que permita um USER solicitar um novo ROLE
+    @Enumerated(EnumType.STRING) // Criar formulário que permita um USER solicitar um novo ROLE
     private Type type;
 
     @Column(nullable = false)
     private String password;
-
-    private Boolean active;
 
     @Column
     private LocalDateTime createdAt;
@@ -56,13 +52,27 @@ public class User {
     @Column
     private LocalDateTime lastLogin;
 
-    private Integer failedAttempts = 0; // utilizar service para limitar.
+    private boolean active = true;
 
-    public User(String username, String numberPhone, String email, String cpf, Type type) {
+    private Integer failedAttempts = 0; // utilizar service para limitar.
+    private LocalDateTime lockUntil; // bloqueia temporariamente
+
+
+    // Separar // > Criar um novo arquivo para registrar em LOG o histórico do login.
+
+    private String lastLoginIp; // salva IP de onde acessou pela última vez.
+    private String lastLoginCountry; // salva país.
+    private String lastLoginCity; // salva cidade.
+
+    public User(String username, String numberPhone, String email, Type type) {
         this.username = username;
         this.numberPhone = numberPhone;
         this.email = email;
-        this.cpf = cpf;
         this.type = type;
+    }
+
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
     }
 }
