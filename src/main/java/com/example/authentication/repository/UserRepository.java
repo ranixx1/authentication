@@ -11,9 +11,10 @@ import com.example.authentication.model.User;
 
 @Repository
 
-public interface UserRepository extends JpaRepository<Integer, User> {
+public interface UserRepository extends JpaRepository<User, Integer> {
     
     Optional<User> findByEmail(String email);
-    Optional<User> findByNumberPhone(String numberPhone);
+    Optional<User> findByPhoneNumber(String phoneNumber);
     List<User> findByType(Type type);
+    List<User> findByActive(boolean active);
 }
