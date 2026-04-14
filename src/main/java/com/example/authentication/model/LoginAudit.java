@@ -32,4 +32,13 @@ public class LoginAudit {
     private boolean success; // true = login OK, false = erro
 
     private String failureReason; // (ex: BAD_CREDENTIALS)
+
+
+    /*@Override
+    public String Tostring(){
+        return "";                            // Seria interessante?
+
+    }
+    */
 }
+
