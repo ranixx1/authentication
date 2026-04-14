@@ -32,6 +32,10 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
+    @Column
+    private String name;
+
+
     @Column(unique = true, nullable = false)
     private String username;
 
@@ -62,7 +66,8 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<LoginAudit> loginAudits;
 
-    public User(String username, String phoneNumber, String email, Type type) {
+    public User(String name, String username, String phoneNumber, String email, Type type) {
+        this.name = name;
         this.username = username;
         this.phoneNumber = phoneNumber;
         this.email = email;
