@@ -24,7 +24,7 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Usuaário não encontrado"));
 
 
-        if (user.isTwoFactorAuthentication() == true) {
+        if (user.isTwoFactorAuthentication()) {
             throw new IllegalArgumentException("Autenticação de dois fatores já está ativa.");
         }
 
