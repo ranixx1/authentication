@@ -62,6 +62,8 @@ public class User {
 
     private Integer failedAttempts = 0; // utilizar service para limitar.
     private LocalDateTime lockUntil; // bloqueia temporariamente
+    private boolean twoFactorAuthentication = false;
+
 
     @OneToMany(mappedBy = "user")
     private List<LoginAudit> loginAudits;
