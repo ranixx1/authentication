@@ -10,6 +10,8 @@ public interface LoginAuditRepository extends JpaRepository <LoginAudit, Long> {
     
     List<LoginAudit> findByCity(String city);
     List<LoginAudit> findByCountry(String country);
+    List<LoginAudit> findBySucess(String sucess);
+    List<LoginAudit> findyByFailureReason(String failureReason);
 
 
 }
