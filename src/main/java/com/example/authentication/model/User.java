@@ -81,3 +81,6 @@ public class User {
         this.createdAt = LocalDateTime.now();
     }
 }
+
+
+// i thought to add a variable : isVerify, when the costumer sent the ID 
