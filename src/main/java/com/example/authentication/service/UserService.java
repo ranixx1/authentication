@@ -9,6 +9,8 @@ import com.example.authentication.repository.UserRepository;
 public class UserService {
     private final UserRepository userRepository;
 
+
+    STATIC 
     // Definir limites de tentativas, padrão de sistema, é 5.
     // Criar reset de senhas, seja com um Recuperar senha, ou com o acerto
     // ((((ARMAZENAR ESSA LOG!))))

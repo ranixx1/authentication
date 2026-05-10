@@ -13,7 +13,7 @@ import com.example.authentication.model.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     
-    Optional<User> findByName(String name);
+    Optional<User> findByUsername(String username);
     Optional<User> findByEmail(String email);
     Optional<User> findByPhoneNumber(String phoneNumber);
     List<User> findByType(Type type);
