@@ -10,7 +10,7 @@ public class UserService {
     private final UserRepository userRepository;
 
 
-    STATIC 
+     
     // Definir limites de tentativas, padrão de sistema, é 5.
     // Criar reset de senhas, seja com um Recuperar senha, ou com o acerto
     // ((((ARMAZENAR ESSA LOG!))))
@@ -23,7 +23,7 @@ public class UserService {
     public boolean activateTwoFactorAuthentication(Long id) {
 
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuaário não encontrado"));
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
 
         if (user.isTwoFactorAuthentication()) {

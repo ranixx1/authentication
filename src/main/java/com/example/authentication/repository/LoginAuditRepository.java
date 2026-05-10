@@ -3,15 +3,19 @@ package com.example.authentication.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
+import com.example.authentication.enums.FailureReason;
 import com.example.authentication.model.LoginAudit;
+
+@Repository
 
 public interface LoginAuditRepository extends JpaRepository <LoginAudit, Long> {
     
     List<LoginAudit> findByCity(String city);
     List<LoginAudit> findByCountry(String country);
-    List<LoginAudit> findBySucess(boolean sucess);
-    List<LoginAudit> findByFailureReason(String failureReason);
+    List<LoginAudit> findBySuccess(boolean success);
+    List<LoginAudit> findByReason(FailureReason reason);
 
 
 }

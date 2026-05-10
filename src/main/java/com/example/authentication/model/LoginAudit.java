@@ -2,6 +2,8 @@ package com.example.authentication.model;
 
 import java.time.LocalDateTime;
 
+import com.example.authentication.enums.FailureReason;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,12 +33,13 @@ public class LoginAudit {
 
     private boolean success; // true = login OK, false = erro
 
-    private String failureReason; // (ex: BAD_CREDENTIALS)
+    @Enumerated(EnumType.STRING)
+    private FailureReason reason; // (ex: BAD_CREDENTIALS)
 
 
     /*@Override
     public String Tostring(){
-        return "";                            // Seria interessante?
+        return "";                            // Seria interessante, para debug.
 
     }
     */
