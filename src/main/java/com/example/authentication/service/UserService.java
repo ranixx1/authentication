@@ -20,6 +20,13 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+
+    public void deactivateUser(Long id){
+        User user = userRepository.findById(id).orElseThrow(()-> new RuntimeException("Usuário não encontrado"));
+
+        user.setActive(false);
+        userRepository.save(user);
+    }
     public boolean activateTwoFactorAuthentication(Long id) {
 
         User user = userRepository.findById(id)
