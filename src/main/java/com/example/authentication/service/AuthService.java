@@ -27,7 +27,7 @@ public class AuthService {
 
     public String login(LoginRequest request, String ip, String agent) {
 
-        User user = userRepository.findByEmail(request.getEmail())
+        User user = userRepository.findByEmailOrUsername(request.getLogin(), request.getLogin())
                 .orElseThrow(() -> new RuntimeException("Invalid credentials"));
 
         if (user.getLockUntil() != null && user.getLockUntil().isAfter(LocalDateTime.now())) {
@@ -50,6 +50,14 @@ public class AuthService {
             saveAudit(user, false, ip, FailureReason.BAD_CREDENTIALS, agent);
 
             throw new RuntimeException("Invalid credentials");
+        }
+
+        if (!user.isActive()) {
+
+            saveAudit(user, false, ip, FailureReason.ACCOUNT_DISABLED, agent);
+            
+            throw new RuntimeException("Invalid credentials");
+
         }
 
         // login sucess?
