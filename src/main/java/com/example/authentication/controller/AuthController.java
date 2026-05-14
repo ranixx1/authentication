@@ -7,9 +7,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.authentication.dto.LoginRequest;
 import com.example.authentication.model.User;
 import com.example.authentication.repository.UserRepository;
 import com.example.authentication.service.AuthService;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/auth")
@@ -22,8 +25,7 @@ public class AuthController {
     public AuthController(
             AuthService authService,
             UserRepository userRepository,
-            PasswordEncoder passwordEncoder
-    ) {
+            PasswordEncoder passwordEncoder) {
         this.authService = authService;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -37,5 +39,17 @@ public class AuthController {
         userRepository.save(user);
 
         return ResponseEntity.ok("Usuário criado");
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletRequest httpRequest) {
+        
+        String ip = httpRequest.getRemoteAddr();
+
+        String agent = httpRequest.getHeader("user-agent");
+
+        String response = authService.login(request, ip, agent);
+        
+        return ResponseEntity.ok(response);
     }
 }
