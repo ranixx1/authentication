@@ -70,7 +70,7 @@ public class AuthService {
 
         saveAudit(user, true, ip, null, agent);
 
-        return "TOKEN_AQUI";
+        return "TOKEN_AQUI";  // implementar jwt
     }
 
     private void saveAudit(
