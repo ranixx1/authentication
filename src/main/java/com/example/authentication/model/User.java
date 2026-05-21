@@ -1,5 +1,6 @@
 package com.example.authentication.model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -34,6 +35,9 @@ public class User {
 
     @Column
     private String name;
+
+    @Column
+    private LocalDate birthDate; 
 
 
     @Column(unique = true, nullable = false)
