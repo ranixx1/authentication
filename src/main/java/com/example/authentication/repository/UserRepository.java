@@ -1,5 +1,6 @@
 package com.example.authentication.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,8 +17,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username);
     Optional<User> findByEmail(String email);
     Optional<User> findByEmailOrUsername( String email,String username);
+    Optional<User> findByEmailOrPhoneNumber(String email, String phoneNumber);
     Optional<User> findByPhoneNumber(String phoneNumber);
     List<User> findByType(Type type);
     List<User> findByActive(boolean active);
+    List<User> findByBirthDate(LocalDate birthDate);
 
 }
