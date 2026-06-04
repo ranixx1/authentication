@@ -2,7 +2,6 @@ package com.example.authentication.model;
 
 import java.time.LocalDateTime;
 
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.example.authentication.enums.FailureReason;
@@ -39,10 +38,6 @@ public class LoginAudit {
 
     @Enumerated(EnumType.STRING)
     private FailureReason reason; // (ex: BAD_CREDENTIALS)
-
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime timestamp;
 }
 
 /*
