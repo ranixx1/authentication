@@ -10,7 +10,7 @@ import com.example.authentication.model.User;
 
 public interface PasswordHistoryRepository extends JpaRepository <PasswordHistory, Long>{
     List<PasswordHistory> findByUser(User user);
-    List<PasswordHistory> findByPasswordChangeReason(PasswordChangeReason reason);
+    List<PasswordHistory> findByReason(PasswordChangeReason reason);
     List<PasswordHistory> findByUserOrderByChangedAtDesc(User user);
     
 }
