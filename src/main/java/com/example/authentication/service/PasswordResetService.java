@@ -3,11 +3,15 @@ package com.example.authentication.service;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.authentication.dto.ResetRequest;
+import com.example.authentication.enums.PasswordChangeReason;
+import com.example.authentication.model.PasswordHistory;
 import com.example.authentication.model.PasswordReset;
 import com.example.authentication.model.User;
+import com.example.authentication.repository.PasswordHistoryRepository;
 import com.example.authentication.repository.PasswordResetRepository;
 import com.example.authentication.repository.UserRepository;
 
@@ -17,17 +21,23 @@ public class PasswordResetService {
     private final PasswordResetRepository passwordResetRepository;
     private final UserRepository userRepository;
     private final EmailService emailService;
+    private final PasswordEncoder passwordEncoder;
+    private final PasswordHistoryRepository passwordHistoryRepository;
 
     public PasswordResetService(
             PasswordResetRepository passwordResetRepository,
             UserRepository userRepository,
-            EmailService emailService
+            EmailService emailService,
+            PasswordEncoder passwordEncoder,
+            PasswordHistoryRepository passwordHistoryRepository
         
         ) {
 
         this.passwordResetRepository = passwordResetRepository;
         this.userRepository = userRepository;
         this.emailService = emailService;
+        this.passwordEncoder = passwordEncoder;
+        this.passwordHistoryRepository = passwordHistoryRepository;
     }
 
     public String passwordReset(ResetRequest request) {
@@ -61,6 +71,30 @@ public class PasswordResetService {
         emailService.sendResetLink(user.getEmail(), token.getToken());
 
         return "Recovery email sent";
+    }
+
+    public void completePasswordReset(String tokenValue, String newPassword){
+        PasswordReset resetToken = passwordResetRepository.findByToken(tokenValue).orElseThrow(()-> new RuntimeException("Invalid token"));
+
+        if(resetToken.isUsed()){
+            throw new RuntimeException("Used token");
+        }
+
+        if(resetToken.getExpireAt().isBefore(LocalDateTime.now())){
+            throw new RuntimeException("Expired token");
+        }
+
+        User user = resetToken.getUser();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        resetToken.setUsed(true);
+        passwordResetRepository.save(resetToken);
+
+        PasswordHistory history = new PasswordHistory();
+        history.setUser(user);
+        history.setReason(PasswordChangeReason.RESET_PASSWORD);
+        passwordHistoryRepository.save(history);
     }
 }
 
