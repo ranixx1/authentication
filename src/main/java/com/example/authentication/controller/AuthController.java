@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.authentication.dto.LoginRequest;
+import com.example.authentication.dto.LoginResponse;
 import com.example.authentication.dto.ResetRequest;
 import com.example.authentication.model.User;
 import com.example.authentication.repository.UserRepository;
@@ -51,14 +52,13 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletRequest httpRequest) {
-
         String ip = httpRequest.getRemoteAddr();
-
         String agent = httpRequest.getHeader("user-agent");
 
-        String response = authService.login(request, ip, agent);
+        String token = authService.login(request, ip, agent);
 
-        return ResponseEntity.ok(response);
+        // Retorna o objeto estruturado
+        return ResponseEntity.ok(new LoginResponse(token));
     }
 
     @PostMapping("/forgot-password")
@@ -68,9 +68,9 @@ public class AuthController {
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestParam String token, @RequestBody Map<String,String> body){
+    public ResponseEntity<?> resetPassword(@RequestParam String token, @RequestBody Map<String, String> body) {
         String newPassword = body.get("newPassword");
         passwordResetService.completePasswordReset(token, newPassword);
-        return ResponseEntity.ok(Map.of("message","Password changed"));
+        return ResponseEntity.ok(Map.of("message", "Password changed"));
     }
 }
