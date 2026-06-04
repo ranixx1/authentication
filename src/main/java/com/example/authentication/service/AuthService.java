@@ -11,18 +11,19 @@ import com.example.authentication.model.LoginAudit;
 import com.example.authentication.model.User;
 import com.example.authentication.repository.LoginAuditRepository;
 import com.example.authentication.repository.UserRepository;
-
 @Service
 public class AuthService {
     private final UserRepository userRepository;
     private final LoginAuditRepository loginAuditRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     public AuthService(UserRepository userRepository, LoginAuditRepository loginAuditRepository,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,JwtService jwtService) {
         this.userRepository = userRepository;
         this.loginAuditRepository = loginAuditRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     public String login(LoginRequest request, String ip, String agent) {
@@ -70,7 +71,7 @@ public class AuthService {
 
         saveAudit(user, true, ip, null, agent);
 
-        return "TOKEN_AQUI";  // implementar jwt
+        return jwtService.generateToken(user);  // implementar jwt
     }
 
     private void saveAudit(
