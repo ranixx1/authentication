@@ -9,5 +9,5 @@ import com.example.authentication.model.PasswordReset;
 
 @Repository
 public interface PasswordResetRepository extends JpaRepository<PasswordReset, Long> {
-    Optional<PasswordReset> findbyToken(String token);
+    Optional<PasswordReset> findByToken(String token);
 }
