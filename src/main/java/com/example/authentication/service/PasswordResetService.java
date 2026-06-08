@@ -1,6 +1,7 @@
 package com.example.authentication.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -74,17 +75,27 @@ public class PasswordResetService {
     }
 
     public void completePasswordReset(String tokenValue, String newPassword){
-        PasswordReset resetToken = passwordResetRepository.findByToken(tokenValue).orElseThrow(()-> new RuntimeException("Invalid token"));
+        PasswordReset resetToken = passwordResetRepository.findByToken(tokenValue).orElseThrow(()-> new RuntimeException("Invalid request"));
 
-        if(resetToken.isUsed()){
-            throw new RuntimeException("Used token");
-        }
-
-        if(resetToken.getExpireAt().isBefore(LocalDateTime.now())){
-            throw new RuntimeException("Expired token");
+        if(resetToken.isUsed() || resetToken.getExpireAt().isBefore(LocalDateTime.now())){
+            throw new RuntimeException("Invalid credentials");
         }
 
         User user = resetToken.getUser();
+
+        if(passwordEncoder.matches(newPassword, user.getPassword())){
+            throw new RuntimeException("The new password cannot be the same the current password");
+        }
+
+        List<PasswordHistory> histories = passwordHistoryRepository.findByUser(user);
+        for(PasswordHistory history:histories){
+            if(history.getOldPassword() != null && passwordEncoder.matches(newPassword, history.getOldPassword())){
+                throw new RuntimeException("The password has been used recently");
+            }
+        }
+
+        String oldPasswordEncrypted = user.getPassword();
+
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
 
@@ -93,6 +104,7 @@ public class PasswordResetService {
 
         PasswordHistory history = new PasswordHistory();
         history.setUser(user);
+        history.setOldPassword(oldPasswordEncrypted);
         history.setReason(PasswordChangeReason.RESET_PASSWORD);
         passwordHistoryRepository.save(history);
     }
