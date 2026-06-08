@@ -33,6 +33,9 @@ public class PasswordHistory {
     private User user;
 
     @Column(nullable = false)
+    private String oldPassword;
+
+    @Column(nullable = false)
     private LocalDateTime changedAt;
 
     @Enumerated(EnumType.STRING)
