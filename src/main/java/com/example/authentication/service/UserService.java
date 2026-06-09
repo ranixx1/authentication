@@ -9,8 +9,6 @@ import com.example.authentication.repository.UserRepository;
 public class UserService {
     private final UserRepository userRepository;
 
-
-     
     // Definir limites de tentativas, padrão de sistema, é 5.
     // Criar reset de senhas, seja com um Recuperar senha, ou com o acerto
     // ((((ARMAZENAR ESSA LOG!))))
@@ -20,21 +18,20 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-
-    public void deactivateUser(Long id){
-        User user = userRepository.findById(id).orElseThrow(()-> new RuntimeException("User not found"));
+    public void deactivateUser(Long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
 
         user.setActive(false);
         userRepository.save(user);
     }
+
     public boolean activateTwoFactorAuthentication(Long id) {
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-
         if (user.isTwoFactorAuthentication()) {
-            throw new IllegalArgumentException("Autenticação de dois fatores já está ativa.");
+            throw new IllegalArgumentException("Two-factor authentication is already enabled.");
         }
 
         user.setTwoFactorAuthentication(true);
