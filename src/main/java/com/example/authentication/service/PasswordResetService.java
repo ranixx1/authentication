@@ -31,8 +31,8 @@ public class PasswordResetService {
             EmailService emailService,
             PasswordEncoder passwordEncoder,
             PasswordHistoryRepository passwordHistoryRepository
-        
-        ) {
+
+    ) {
 
         this.passwordResetRepository = passwordResetRepository;
         this.userRepository = userRepository;
@@ -44,27 +44,24 @@ public class PasswordResetService {
     public String passwordReset(ResetRequest request) {
 
         User user = userRepository
-                .findByEmailOrUsername(
-                        request.getReset(),
-                        request.getReset()
-                )
-                .orElseThrow(() ->
-                        new RuntimeException("Invalid requests"));
+                .findByEmailOrUsername(request.getReset(), request.getReset())
+                .orElseThrow(() -> new RuntimeException("Invalid request"));
 
         if (!user.getBirthDate().equals(request.getBirthDate())) {
-            throw new RuntimeException("Invalid requests");
+            throw new RuntimeException("Invalid request");
         }
 
+        // Invalidate any existing unused token for this user
+        passwordResetRepository.findActiveTokenByUser(user, LocalDateTime.now())
+                .ifPresent(old -> {
+                    old.setUsed(true);
+                    passwordResetRepository.save(old);
+                });
+
         PasswordReset token = new PasswordReset();
-
         token.setUser(user);
-
         token.setToken(UUID.randomUUID().toString());
-
-        token.setExpireAt(
-                LocalDateTime.now().plusMinutes(30)
-        );
-
+        token.setExpireAt(LocalDateTime.now().plusMinutes(30));
         token.setUsed(false);
 
         passwordResetRepository.save(token);
@@ -74,22 +71,23 @@ public class PasswordResetService {
         return "Recovery email sent";
     }
 
-    public void completePasswordReset(String tokenValue, String newPassword){
-        PasswordReset resetToken = passwordResetRepository.findByToken(tokenValue).orElseThrow(()-> new RuntimeException("Invalid request"));
+    public void completePasswordReset(String tokenValue, String newPassword) {
+        PasswordReset resetToken = passwordResetRepository.findByToken(tokenValue)
+                .orElseThrow(() -> new RuntimeException("Invalid request"));
 
-        if(resetToken.isUsed() || resetToken.getExpireAt().isBefore(LocalDateTime.now())){
+        if (resetToken.isUsed() || resetToken.getExpireAt().isBefore(LocalDateTime.now())) {
             throw new RuntimeException("Invalid request");
         }
 
         User user = resetToken.getUser();
 
-        if(passwordEncoder.matches(newPassword, user.getPassword())){
+        if (passwordEncoder.matches(newPassword, user.getPassword())) {
             throw new RuntimeException("The new password cannot be the same the current password");
         }
 
         List<PasswordHistory> histories = passwordHistoryRepository.findByUser(user);
-        for(PasswordHistory history:histories){
-            if(history.getOldPassword() != null && passwordEncoder.matches(newPassword, history.getOldPassword())){
+        for (PasswordHistory history : histories) {
+            if (history.getOldPassword() != null && passwordEncoder.matches(newPassword, history.getOldPassword())) {
                 throw new RuntimeException("The password has been used recently");
             }
         }

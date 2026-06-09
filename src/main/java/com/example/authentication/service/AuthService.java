@@ -8,7 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.example.authentication.dto.LoginRequest;
 import com.example.authentication.enums.FailureReason;
-import com.example.exception.UnauthorizedException;
+import com.example.authentication.exception.UnauthorizedException;
 import com.example.authentication.model.LoginAudit;
 import com.example.authentication.model.User;
 import com.example.authentication.repository.LoginAuditRepository;
