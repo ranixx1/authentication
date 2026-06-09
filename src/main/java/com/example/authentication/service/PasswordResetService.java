@@ -49,10 +49,10 @@ public class PasswordResetService {
                         request.getReset()
                 )
                 .orElseThrow(() ->
-                        new RuntimeException("Invalid credentials"));
+                        new RuntimeException("Invalid requests"));
 
         if (!user.getBirthDate().equals(request.getBirthDate())) {
-            throw new RuntimeException("Invalid credentials");
+            throw new RuntimeException("Invalid requests");
         }
 
         PasswordReset token = new PasswordReset();
@@ -78,7 +78,7 @@ public class PasswordResetService {
         PasswordReset resetToken = passwordResetRepository.findByToken(tokenValue).orElseThrow(()-> new RuntimeException("Invalid request"));
 
         if(resetToken.isUsed() || resetToken.getExpireAt().isBefore(LocalDateTime.now())){
-            throw new RuntimeException("Invalid credentials");
+            throw new RuntimeException("Invalid request");
         }
 
         User user = resetToken.getUser();
