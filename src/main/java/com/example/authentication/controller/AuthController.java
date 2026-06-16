@@ -2,9 +2,7 @@ package com.example.authentication.controller;
 
 import java.util.Map;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,9 +13,6 @@ import com.example.authentication.dto.LoginRequest;
 import com.example.authentication.dto.LoginResponse;
 import com.example.authentication.dto.RegisterRequest;
 import com.example.authentication.dto.ResetRequest;
-import com.example.authentication.enums.Type;
-import com.example.authentication.model.User;
-import com.example.authentication.repository.UserRepository;
 import com.example.authentication.service.AuthService;
 import com.example.authentication.service.PasswordResetService;
 
