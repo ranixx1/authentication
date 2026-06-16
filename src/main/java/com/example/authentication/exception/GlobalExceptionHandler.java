@@ -23,6 +23,25 @@ public class GlobalExceptionHandler {
                 "timestamp", LocalDateTime.now().toString(),
                 "status", 400,
                 "errors", fieldErrors));
+
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<Map<String, Object>> handleConflict(UserAlreadyExistsException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
+                "timestamp", LocalDateTime.now().toString(),
+                "status", 409,
+                "error", "Conflict",
+                "message", ex.getMessage()));
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<Map<String, Object>> handleUnauthorized(UnauthorizedException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+                "timestamp", LocalDateTime.now().toString(),
+                "status", 401,
+                "error", "Unauthorized",
+                "message", ex.getMessage()));
     }
 
     @ExceptionHandler(RuntimeException.class)

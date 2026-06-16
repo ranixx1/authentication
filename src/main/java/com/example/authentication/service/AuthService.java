@@ -7,8 +7,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.example.authentication.dto.LoginRequest;
+import com.example.authentication.dto.RegisterRequest;
 import com.example.authentication.enums.FailureReason;
+import com.example.authentication.enums.Type;
 import com.example.authentication.exception.UnauthorizedException;
+import com.example.authentication.exception.UserAlreadyExistsException;
 import com.example.authentication.model.LoginAudit;
 import com.example.authentication.model.User;
 import com.example.authentication.repository.LoginAuditRepository;
@@ -29,6 +32,25 @@ public class AuthService {
         this.loginAuditRepository = loginAuditRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+    }
+
+    public void register(RegisterRequest request) {
+        if (userRepository.findByUsername(request.getUsername()).isPresent()
+                || userRepository.findByEmail(request.getEmail()).isPresent())
+            throw new UserAlreadyExistsException("Username or e-mail already in use");
+
+        User user = new User();
+        user.setName(request.getName());
+        user.setBirthDate(request.getBirthDate());
+        user.setUsername(request.getUsername());
+        user.setPhoneNumber(request.getPhoneNumber());
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setType(Type.ROLE_NORMAL);
+        user.setActive(true);
+        user.setFailedAttempts(0);
+
+        userRepository.save(user);
     }
 
     public String login(LoginRequest request, String ipAddress, String userAgent) {

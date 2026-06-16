@@ -29,43 +29,18 @@ import jakarta.validation.Valid;
 public class AuthController {
 
     private final AuthService authService;
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
     private final PasswordResetService passwordResetService;
 
     public AuthController(
             AuthService authService,
-            UserRepository userRepository,
-            PasswordEncoder passwordEncoder,
             PasswordResetService passwordResetService) {
         this.authService = authService;
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
         this.passwordResetService = passwordResetService;
     }
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
-
-        if (userRepository.findByUsername(request.getUsername()).isPresent() ||
-                userRepository.findByEmail(request.getEmail()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", "User already exists"));
-
-        }
-
-        User user = new User();
-        user.setName(request.getName());
-        user.setBirthDate(request.getBirthDate());
-        user.setUsername(request.getUsername());
-        user.setPhoneNumber(request.getPhoneNumber());
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setType(Type.ROLE_NORMAL);
-        user.setActive(true);
-        user.setFailedAttempts(0);
-
-        userRepository.save(user);
-
+        authService.register(request);
         return ResponseEntity.ok(Map.of("message", "User registered successfully"));
     }
 
