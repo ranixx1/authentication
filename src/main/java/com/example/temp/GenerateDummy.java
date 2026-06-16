@@ -1,0 +1,9 @@
+package com.example.temp;
+
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+public class GenerateDummy {
+    public static void main(String[] args) {
+        System.out.println(new BCryptPasswordEncoder().encode("dummy-placeholder"));
+    }
+}

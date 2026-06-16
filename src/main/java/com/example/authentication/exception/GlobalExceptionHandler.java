@@ -44,6 +44,16 @@ public class GlobalExceptionHandler {
                 "message", ex.getMessage()));
     }
 
+  @ExceptionHandler(InvalidResetRequestException.class)
+public ResponseEntity<Map<String, Object>> handleInvalidReset(InvalidResetRequestException ex) {
+    return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(Map.of(
+        "timestamp", LocalDateTime.now().toString(),
+        "status", 422,
+        "error", "Unprocessable Entity",
+        "message", ex.getMessage()
+    ));
+}
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, Object>> handleRuntime(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(

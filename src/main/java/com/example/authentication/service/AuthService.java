@@ -21,6 +21,8 @@ import com.example.authentication.repository.UserRepository;
 @Transactional
 public class AuthService {
 
+    private static final String DUMMY_HASH = "$2a$10$W9XmPlWyLJy9KQTT/ml03eAzi3Z8Q2Hp0Ikgw/3ASzmE9It0xPZvy";
+
     private final UserRepository userRepository;
     private final LoginAuditRepository loginAuditRepository;
     private final PasswordEncoder passwordEncoder;
@@ -55,43 +57,45 @@ public class AuthService {
 
     public String login(LoginRequest request, String ipAddress, String userAgent) {
 
-        User user = userRepository.findByEmailOrUsername(request.getLogin(), request.getLogin())
-                .orElseThrow(() -> new UnauthorizedException("Invalid credentials"));
+        User user = userRepository
+                .findByEmailOrUsername(request.getLogin(), request.getLogin())
+                .orElse(null);
 
-        // Check if account is disabled before any other validation
+        // elimina timing attack
+        String hashToCheck = (user != null) ? user.getPassword() : DUMMY_HASH;
+        boolean passwordMatches = passwordEncoder.matches(request.getPassword(), hashToCheck);
+
+        if (user == null) {
+            throw new UnauthorizedException("Invalid credentials");
+        }
+
         if (!user.isActive()) {
             saveAudit(user, false, ipAddress, FailureReason.ACCOUNT_DISABLED, userAgent);
             throw new UnauthorizedException("Invalid credentials");
         }
 
-        // Check if account is temporarily locked due to failed attempts
         if (user.getLockUntil() != null && user.getLockUntil().isAfter(LocalDateTime.now())) {
             saveAudit(user, false, ipAddress, FailureReason.ACCOUNT_LOCKED, userAgent);
             throw new UnauthorizedException("Invalid credentials");
         }
 
-        // Validate password
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        if (!passwordMatches) {
             int attempts = user.getFailedAttempts() + 1;
             user.setFailedAttempts(attempts);
-
             if (attempts >= 5) {
                 user.setLockUntil(LocalDateTime.now().plusMinutes(5));
             }
-
             userRepository.save(user);
             saveAudit(user, false, ipAddress, FailureReason.BAD_CREDENTIALS, userAgent);
             throw new UnauthorizedException("Invalid credentials");
         }
 
-        // Successful login — reset lock state and record last login
         user.setFailedAttempts(0);
         user.setLockUntil(null);
         user.setLastLogin(LocalDateTime.now());
         userRepository.save(user);
 
         saveAudit(user, true, ipAddress, null, userAgent);
-
         return jwtService.generateToken(user);
     }
 
