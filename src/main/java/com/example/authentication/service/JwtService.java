@@ -20,16 +20,18 @@ public class JwtService {
     @Value("${app.jwt.secret}")
     private String secretKey;
 
+    @Value("${app.jwt.expiration}")
+    private long expiration;
 
     public String generateToken(User user) {
         return Jwts.builder()
-            .subject(user.getUsername())
-            .claim("email", user.getEmail())
-            .claim("role", user.getType().name())
-            .issuedAt(new Date())
-            .expiration(new Date(System.currentTimeMillis() + 86400000))
-            .signWith(getSigningKey(), Jwts.SIG.HS256)
-            .compact();
+                .subject(user.getUsername())
+                .claim("email", user.getEmail())
+                .claim("role", user.getType().name())
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(getSigningKey(), Jwts.SIG.HS256)
+                .compact();
     }
 
     public String extractUsername(String token) {
@@ -51,10 +53,10 @@ public class JwtService {
 
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
-            .verifyWith(getSigningKey())
-            .build()
-            .parseSignedClaims(token)
-            .getPayload();
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     private SecretKey getSigningKey() {
