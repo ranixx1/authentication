@@ -8,9 +8,12 @@ import com.example.authentication.enums.PasswordChangeReason;
 import com.example.authentication.model.PasswordHistory;
 import com.example.authentication.model.User;
 
-public interface PasswordHistoryRepository extends JpaRepository <PasswordHistory, Long>{
+public interface PasswordHistoryRepository extends JpaRepository<PasswordHistory, Long> {
     List<PasswordHistory> findByUser(User user);
+
     List<PasswordHistory> findByReason(PasswordChangeReason reason);
+
     List<PasswordHistory> findByUserOrderByChangedAtDesc(User user);
-    
+
+    List<PasswordHistory> findTop5ByUserOrderByChangedAtDesc(User user);
 }
