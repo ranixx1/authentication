@@ -14,6 +14,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 
 import com.example.authentication.service.JwtService;
+
 @Configuration
 public class SecurityConfig {
 
@@ -28,21 +29,38 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http
             .cors(cors -> cors.configurationSource(request -> {
                 CorsConfiguration config = new CorsConfiguration();
-                config.setAllowedOrigins(List.of(allowedOrigins.split(",")));
-                config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+
+                config.setAllowedOrigins(
+                    List.of(allowedOrigins.split(","))
+                );
+
+                config.setAllowedMethods(
+                    List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                );
+
                 config.setAllowedHeaders(List.of("*"));
+
+                config.setAllowCredentials(true);
+
                 return config;
             }))
             .csrf(csrf -> csrf.disable())
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .sessionManagement(session ->
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/**").permitAll()
                 .anyRequest().authenticated()
             )
-            .addFilterBefore(new JwtAuthenticationFilter(jwtService), UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(
+                new JwtAuthenticationFilter(jwtService),
+                UsernamePasswordAuthenticationFilter.class
+            );
+
         return http.build();
     }
 
