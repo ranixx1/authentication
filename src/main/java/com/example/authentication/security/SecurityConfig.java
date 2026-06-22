@@ -45,7 +45,7 @@ public class SecurityConfig {
             )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/**").permitAll()
-                .requestMatchers("/admin/**").authenticated() 
+                .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN") 
                 .anyRequest().authenticated()
             )
             .addFilterBefore(
