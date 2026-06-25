@@ -1,41 +1,19 @@
 package com.example.authentication.repository;
 
-import java.util.List;
-
+import com.example.authentication.enums.FailureReason;
+import com.example.authentication.model.LoginAudit;
+import com.example.authentication.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.example.authentication.enums.FailureReason;
-import com.example.authentication.model.LoginAudit;
+import java.util.List;
 
 @Repository
+public interface LoginAuditRepository extends JpaRepository<LoginAudit, Long> {
 
-public interface LoginAuditRepository extends JpaRepository <LoginAudit, Long> {
-    
     List<LoginAudit> findByCity(String city);
     List<LoginAudit> findByCountry(String country);
     List<LoginAudit> findBySuccess(boolean success);
     List<LoginAudit> findByReason(FailureReason reason);
-
-
+    List<LoginAudit> findTop10ByUserOrderByLoginTimeDesc(User user);
 }
-
-/*
-  @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
-    private LocalDateTime loginTime;
-
-    private String ipAddress; 
-    private String country;
-    private String city;
-
-    private String userAgent; // navegador/dispositivo  // Não vejo como interessante filtrar por navegador ou dispositivo.
-
-    private boolean success; // true = login OK, false = erro // Seria interessante retornar uma lista com todos os acessos com sucesso?
-    List<LoginAudit> findBySucess(String sucess) **
-
-    private String failureReason; // (ex: BAD_CREDENTIALS)  // Seria interessante retornar uma lista com registros de LOG com o erro especificado?
-    List<LoginAudit> findyByFailureReason(String failureReason) **
-}
-*/
