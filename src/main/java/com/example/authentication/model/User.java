@@ -50,7 +50,7 @@ public class User {
     private String email;
 
     @Column
-    @Enumerated(EnumType.STRING) // Criar formulário que permita um USER solicitar um novo ROLE
+    @Enumerated(EnumType.STRING) 
     private Type type;
 
     @Column(nullable = false)
@@ -64,8 +64,8 @@ public class User {
 
     private boolean active = true;
 
-    private Integer failedAttempts = 0; // utilizar service para limitar.
-    private LocalDateTime lockUntil; // bloqueia temporariamente
+    private Integer failedAttempts = 0; 
+    private LocalDateTime lockUntil; 
     private boolean twoFactorAuthentication = false;
     
 
@@ -88,4 +88,3 @@ public class User {
 }
 
 
-// i thought to add a variable : isVerify, when the costumer sent the ID 

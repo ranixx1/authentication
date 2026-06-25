@@ -1,5 +1,3 @@
-// src/main/java/com/example/authentication/exception/UnauthorizedException.java
-
 package com.example.authentication.exception;
 
 import org.springframework.http.HttpStatus;

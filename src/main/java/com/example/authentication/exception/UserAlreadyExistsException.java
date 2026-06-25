@@ -1,4 +1,3 @@
-// exception/UserAlreadyExistsException.java
 package com.example.authentication.exception;
 
 import org.springframework.http.HttpStatus;

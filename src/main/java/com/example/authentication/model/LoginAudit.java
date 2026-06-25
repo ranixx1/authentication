@@ -20,8 +20,7 @@ public class LoginAudit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    // Relação com usuário
+    
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -37,13 +36,5 @@ public class LoginAudit {
     private boolean success; // true = login OK, false = erro
 
     @Enumerated(EnumType.STRING)
-    private FailureReason reason; // (ex: BAD_CREDENTIALS)
+    private FailureReason reason; 
 }
-
-/*
- * @Override
- * public String Tostring(){
- * return ""; // Seria interessante, para debug.
- * 
- * }
- */

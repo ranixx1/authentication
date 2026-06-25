@@ -46,6 +46,3 @@ public class PasswordReset {
     }
 }
 
-/*
-id, user, token, expiração, usado?, data de criação. OK
-*/
