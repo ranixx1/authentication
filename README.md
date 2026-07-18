@@ -1,6 +1,6 @@
 # Authentication Service
 
-Microsserviço de autenticação e gerenciamento de usuários do sistema **Jira 2.0 Help Desk**. Responsável por registro, login com JWT, recuperação de senha e administração de contas.
+Microsserviço de autenticação para ser a base dos meus futuros projetos. Responsável por registro, login com JWT, recuperação de senha e administração de contas.
 
 > **Porta padrão:** `8080`
 
