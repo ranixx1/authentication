@@ -26,6 +26,7 @@ public class JwtService {
     public String generateToken(User user) {
         return Jwts.builder()
                 .subject(user.getUsername())
+                .claim("userId", user.getUserId())
                 .claim("email", user.getEmail())
                 .claim("role", user.getType().name())
                 .issuedAt(new Date())
