@@ -1,0 +1,429 @@
+openapi: 3.0.3
+info:
+  title: Authentication Service API
+  version: 1.0.0
+  description: API para registro, login (JWT), recuperação de senha e administração de usuários.
+servers:
+  - url: http://localhost:8080
+paths:
+  /auth/register:
+    post:
+      summary: Registra novo usuário
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+            examples:
+              register:
+                value:
+                  name: "João Silva"
+                  birthDate: "1998-05-20"
+                  username: "joaosilva"
+                  phoneNumber: "+5511999999999"
+                  email: "joao@example.com"
+                  password: "superSecret!"
+      responses:
+        '200':
+          description: Usuário registrado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: Erro de validação
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '409':
+          description: Username ou email já em uso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/login:
+    post:
+      summary: Faz login e retorna um JWT
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            examples:
+              login:
+                value:
+                  login: "joao@example.com"
+                  password: "superSecret!"
+      responses:
+        '200':
+          description: Token JWT retornado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: Requisição inválida / bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Credenciais inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/forgot-password:
+    post:
+      summary: Solicita recuperação de senha (envia e-mail)
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetRequest'
+            examples:
+              reset:
+                value:
+                  reset: "joao@example.com"
+                  birthDate: "1998-05-20"
+      responses:
+        '200':
+          description: Email de recuperação enviado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '422':
+          description: Requisição inválida para reset
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/reset-password:
+    post:
+      summary: Conclui troca de senha via token
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompleteResetRequest'
+            examples:
+              complete:
+                value:
+                  token: "token-gerado-no-email"
+                  newPassword: "newStrongPassword!"
+      responses:
+        '200':
+          description: Senha alterada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '422':
+          description: Token inválido/expirado ou regra de senha violada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /admin/users:
+    get:
+      summary: Lista usuários (resumo)
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de usuários
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserSummaryResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /admin/users/{id}:
+    get:
+      summary: Detalha um usuário
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        '200':
+          description: Detalhes do usuário
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetailResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Usuário não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /admin/users/{id}/role:
+    put:
+      summary: Altera role de um usuário
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRoleRequest'
+            examples:
+              role:
+                value:
+                  role: "ROLE_ADMIN"
+      responses:
+        '204':
+          description: Role alterada (No Content)
+        '400':
+          description: Requisição inválida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /admin/users/{id}/active:
+    put:
+      summary: Ativa/desativa usuário
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+        - name: active
+          in: query
+          required: true
+          schema:
+            type: boolean
+      responses:
+        '204':
+          description: Usuário atualizado (No Content)
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    idParam:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  schemas:
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      example:
+        message: "User registered successfully"
+
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+        error:
+          type: string
+        message:
+          type: string
+      example:
+        timestamp: "2026-08-04T12:34:56"
+        status: 401
+        error: "Unauthorized"
+        message: "Invalid credentials"
+
+    ValidationErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+        errors:
+          type: object
+          additionalProperties:
+            type: string
+      example:
+        timestamp: "2026-08-04T12:34:56"
+        status: 400
+        errors:
+          email: "Invalid email format"
+          password: "Password must be at least 8 characters"
+
+    LoginRequest:
+      type: object
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+      required: [login, password]
+
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+      required: [token]
+      example:
+        token: "eyJhbGciOiJIUzI1NiJ9..."
+
+    RegisterRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        birthDate:
+          type: string
+          format: date
+        username:
+          type: string
+        phoneNumber:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+      required: [name, birthDate, username, phoneNumber, email, password]
+
+    ResetRequest:
+      type: object
+      properties:
+        reset:
+          type: string
+          description: "email ou username"
+        birthDate:
+          type: string
+          format: date
+      required: [reset, birthDate]
+
+    CompleteResetRequest:
+      type: object
+      properties:
+        token:
+          type: string
+        newPassword:
+          type: string
+      required: [token, newPassword]
+
+    UpdateRoleRequest:
+      type: object
+      properties:
+        role:
+          type: string
+      required: [role]
+
+    AuditSummary:
+      type: object
+      properties:
+        loginTime:
+          type: string
+          format: date-time
+        ipAddress:
+          type: string
+        success:
+          type: boolean
+        failureReason:
+          type: string
+          nullable: true
+        userAgent:
+          type: string
+
+    UserSummaryResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+        active:
+          type: boolean
+        lastLogin:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+
+    UserDetailResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        phoneNumber:
+          type: string
+        role:
+          type: string
+        active:
+          type: boolean
+        failedAttempts:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        lastLogin:
+          type: string
+          format: date-time
+        recentActivity:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditSummary'
