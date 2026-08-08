@@ -1,4 +1,4 @@
-# Authentication Service
+# Authentication Service - Teassitura
 
 Microsserviço de autenticação para ser a base dos meus futuros projetos. Responsável por registro, login com JWT, recuperação de senha e administração de contas.
 
@@ -171,7 +171,7 @@ O payload do JWT contém: `sub` (username), `userId`, `email`, `role`, `iat`, `e
 
 ```bash
 # Clone o repositório
-git clone https://github.com/ranixx1/authentication.git
+git clone https://github.com/ranixx1/tessitura_auth.git
 cd authentication
 
 # Configure as variáveis de ambiente (ou crie application-dev.properties)
