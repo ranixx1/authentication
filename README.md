@@ -205,7 +205,7 @@ O serviço sobe em `http://localhost:8080`.
 
 ## Roadmap planejado
 
-- [ ] Endpoint de perfil do usuário (`GET /users/me`)
+- [x] Endpoint user (`GET /users/me`)
 - [x] Recover password
 - [ ] Refresh token
-- [ ] 2FA via e-mail ou TOTP
+- [x] recover password via e-mail
